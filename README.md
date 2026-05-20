@@ -47,7 +47,57 @@ pip install -e .
 
 ## Claude Code Integration
 
-Copy the example config and edit it for your setup:
+There are two ways to register EvmCommMCP: **globally** (available in every
+Claude Code session on your machine) or **per-project** (only active when Claude
+Code is opened inside a specific directory).
+
+### Global installation (recommended)
+
+Register it once with the Claude Code CLI and it works everywhere:
+
+```bash
+claude mcp add evmcomm \
+  --scope user \
+  -e EVM_PORT=/dev/ttyUSB0 \
+  -- /path/to/EvmCommMCP/venv/bin/python -m evmcomm
+```
+
+Replace `/path/to/EvmCommMCP` with the absolute path where you cloned the repo
+(e.g. `/home/raj/adas/EvmCommMCP`).
+
+This writes the entry to `~/.claude.json` under `mcpServers`, so it is loaded
+for every project without any `.mcp.json` file needed.
+
+**Optional env vars** — pass as many `-e KEY=VALUE` flags as needed:
+
+```bash
+claude mcp add evmcomm \
+  --scope user \
+  -e EVM_PORT=/dev/ttyUSB0 \
+  -e EVM_BAUD=115200 \
+  -e EVM_PROMPT="J784S4-EVM@QNX" \
+  -e EVM_LOG_FILE=/tmp/evm.log \
+  -- /path/to/EvmCommMCP/venv/bin/python -m evmcomm
+```
+
+To verify the entry was added:
+
+```bash
+claude mcp list
+```
+
+To remove it later:
+
+```bash
+claude mcp remove evmcomm --scope user
+```
+
+---
+
+### Per-project installation
+
+Useful when different projects need different boards or port settings. Copy the
+example config into the project root and edit it:
 
 ```bash
 cp .mcp.json.example .mcp.json
@@ -71,7 +121,12 @@ cp .mcp.json.example .mcp.json
 }
 ```
 
-Restart Claude Code. The tools become available immediately.
+`.mcp.json` is git-ignored by default. Commit `.mcp.json.example` instead so
+teammates can copy and adapt it for their own setup.
+
+---
+
+Restart Claude Code after any config change. The tools become available immediately.
 
 ---
 
@@ -117,14 +172,30 @@ Sends a command to the board and returns the response.
 
 ```
 Input:
-  command   Command string (newline appended automatically)
-  timeout   Seconds to wait for the prompt  (default: 30)
+  command    Command string (newline appended automatically)
+  timeout    Seconds to wait for the prompt       (default: 30)
+  wait_for   Regex/literal to wait for instead of
+             the session prompt                   (default: session prompt)
 
 Output: {"command": "...", "response": "...", "elapsed_ms": 312}
 ```
 
 On timeout, returns `{"error": "...", "partial_output": "..."}` with whatever
 the board printed before the deadline.
+
+**`wait_for` — interactive demo tip:**  
+Interactive apps (Vision Apps demos, RTOS menus) never return to the shell
+prompt while running. Use `wait_for` to match the app's own prompt instead,
+which lets you use short timeouts and get responses immediately:
+
+```
+# wrong — waits the full timeout every time
+send_command("p", timeout=30)
+
+# right — returns as soon as the menu reappears (~1-2s)
+send_command("p", timeout=10, wait_for="Enter Choice:")
+send_command("x", timeout=15)   # exit → shell prompt, no wait_for needed
+```
 
 ### `read_output`
 
