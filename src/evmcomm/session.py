@@ -137,16 +137,18 @@ class UartSession:
         self._port = None
         return port
 
-    def send(self, command: str, timeout: int = 30) -> tuple[bool, str]:
+    def send(self, command: str, timeout: int = 30, wait_for: str = "") -> tuple[bool, str]:
         """
-        Write `command` to the board and wait for the session prompt.
-        Returns (prompt_seen, response_text).
+        Write `command` to the board and wait for a pattern.
+        Uses `wait_for` if given, otherwise falls back to the session prompt.
+        Returns (pattern_seen, response_text).
         """
         if not self.is_open:
             raise NoSessionError()
+        pattern = wait_for if wait_for else self._prompt
         self._reader.clear()
         self._ser.write((command + "\n").encode("utf-8", errors="replace"))
-        matched, captured = self._reader.wait_for(self._prompt, timeout)
+        matched, captured = self._reader.wait_for(pattern, timeout)
         return matched, _strip_ansi(captured)
 
     def read(self, duration: float) -> str:

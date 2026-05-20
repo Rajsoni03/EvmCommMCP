@@ -112,24 +112,28 @@ def close_port() -> str:
 
 
 @mcp.tool()
-def send_command(command: str, timeout: int = 30) -> str:
+def send_command(command: str, timeout: int = 30, wait_for: str = "") -> str:
     """Send a command to the EVM board and return the response.
 
     Args:
         command: Command string to send (newline appended automatically).
         timeout: Seconds to wait for the prompt in the response (default 30).
+        wait_for: Optional pattern (regex) to wait for instead of the session
+                  prompt. Useful for interactive demos that show their own menu
+                  (e.g. wait_for="Enter Choice:" instead of waiting for the
+                  shell prompt). On timeout, partial_output is always returned.
     """
     import time
 
     try:
         t0 = time.monotonic()
-        matched, response = _session.send(command, timeout)
+        matched, response = _session.send(command, timeout, wait_for)
         elapsed = int((time.monotonic() - t0) * 1000)
 
         if not matched:
             return _err(
-                f"Timeout: prompt not seen after {timeout}s",
-                "Try a longer timeout or check the board is at a prompt",
+                f"Timeout: pattern not seen after {timeout}s",
+                "Use wait_for= to match the app's own prompt, or use get_log to read the buffer",
                 partial_output=response,
                 elapsed_ms=elapsed,
             )
