@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "evmcomm": {
+      "type": "stdio",
+      "command": "/path/to/EvmCommMCP/venv/bin/python",
+      "args": ["-m", "evmcomm"],
+      "cwd": "/path/to/EvmCommMCP",
+      "env": {
+        "EVM_PORT": "/dev/ttyUSB0"
+      }
+    }
+  }
+}

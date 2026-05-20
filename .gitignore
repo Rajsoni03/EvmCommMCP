@@ -216,3 +216,9 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Application Specific Ignores
+PLAN.md
+.claude/
+.mcp.json
+

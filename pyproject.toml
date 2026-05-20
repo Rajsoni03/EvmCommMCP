@@ -1,0 +1,15 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "evmcomm"
+version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = ["mcp[cli]>=1.0.0", "pyserial>=3.5"]
+
+[project.scripts]
+evmcomm = "evmcomm.server:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/evmcomm"]
