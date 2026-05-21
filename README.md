@@ -36,6 +36,7 @@ not just in response to a command.
 ## Installation
 
 ```bash
+mkdir -p ~/.mcp && cd ~/.mcp # this is a convenient place to keep MCP servers, but you can clone it anywhere
 git clone https://github.com/Rajsoni03/EvmCommMCP.git
 cd EvmCommMCP
 python3 -m venv venv
@@ -51,7 +52,7 @@ There are two ways to register EvmCommMCP: **globally** (available in every
 Claude Code session on your machine) or **per-project** (only active when Claude
 Code is opened inside a specific directory).
 
-### Global installation (recommended)
+### Global installation **(recommended)**
 
 Register it once with the Claude Code CLI and it works everywhere:
 
@@ -59,16 +60,14 @@ Register it once with the Claude Code CLI and it works everywhere:
 claude mcp add evmcomm \
   --scope user \
   -e EVM_PORT=/dev/ttyUSB0 \
-  -- /path/to/EvmCommMCP/venv/bin/python -m evmcomm
+  -- ~/.mcp/EvmCommMCP/venv/bin/python -m evmcomm
 ```
-
-Replace `/path/to/EvmCommMCP` with the absolute path where you cloned the repo
-(e.g. `/home/raj/adas/EvmCommMCP`).
+Replace `~/.mcp/EvmCommMCP` with the actual path where you cloned the repo.
 
 This writes the entry to `~/.claude.json` under `mcpServers`, so it is loaded
 for every project without any `.mcp.json` file needed.
 
-**Optional env vars** — pass as many `-e KEY=VALUE` flags as needed:
+### Optional env vars — pass as many `-e KEY=VALUE` flags as needed:
 
 ```bash
 claude mcp add evmcomm \
@@ -77,7 +76,7 @@ claude mcp add evmcomm \
   -e EVM_BAUD=115200 \
   -e EVM_PROMPT="J784S4-EVM@QNX" \
   -e EVM_LOG_FILE=/tmp/evm.log \
-  -- /path/to/EvmCommMCP/venv/bin/python -m evmcomm
+  -- ~/.mcp/EvmCommMCP/venv/bin/python -m evmcomm
 ```
 
 To verify the entry was added:
@@ -110,9 +109,9 @@ cp .mcp.json.example .mcp.json
   "mcpServers": {
     "evmcomm": {
       "type": "stdio",
-      "command": "/path/to/EvmCommMCP/venv/bin/python",
+      "command": "~/.mcp/EvmCommMCP/venv/bin/python",
       "args": ["-m", "evmcomm"],
-      "cwd": "/path/to/EvmCommMCP",
+      "cwd": "~/.mcp/EvmCommMCP",
       "env": {
         "EVM_PORT": "/dev/ttyUSB0"
       }
